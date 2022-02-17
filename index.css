@@ -1,0 +1,49 @@
+/*Font imports*/
+@font-face {
+  font-family: "04B30";
+  src: url('assets/04B30.ttf');
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  font-family: "04B30";
+  font-size: 8vw;
+  color: white;
+  letter-spacing: -0.05em;
+}
+
+/*Precision-repeat moving background */
+body {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(-45deg, #f87fb4, #fae768, #ff7f5b, #f87fb4, #fae768);
+  background-size: 400% 400%;
+  margin: 0;
+  overflow: hidden;
+
+  animation: movingBkg 15s linear infinite;
+  -moz-animation: movingBkg 15s linear infinite;
+  -webkit-animation: movingBkg 15s linear infinite;
+}
+/*Animation*/
+@keyframes movingBkg {
+  0%{background-position: top left}
+  100%{background-position: right bottom}
+}
+@-moz-keyframes movingBkg {
+  0%{background-position: top left}
+  100%{background-position: right bottom}
+}
+@-webkit-keyframes movingBkg {
+  0%{background-position: top left}
+  100%{background-position: right bottom}
+}
