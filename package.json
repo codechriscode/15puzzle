@@ -1,0 +1,29 @@
+{
+  "name": "15puzzle",
+  "version": "1.0.0",
+  "description": "My 15puzzle UI implementation",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codechriscode/15puzzle.git"
+  },
+  "keywords": [
+    "typescript",
+    "15puzzle",
+    "puzzle",
+    "game",
+    "kids"
+  ],
+  "author": "codechriscode",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codechriscode/15puzzle/issues"
+  },
+  "homepage": "https://github.com/codechriscode/15puzzle#readme",
+  "devDependencies": {
+    "typescript": "^4.5.5"
+  }
+}
