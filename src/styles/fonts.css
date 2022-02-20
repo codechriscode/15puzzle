@@ -1,0 +1,51 @@
+/*Font imports*/
+@font-face {
+  font-family: "04B30";
+  src: url("../../assets/04B30.ttf");
+}
+@font-face {
+  font-family: "boxyBold";
+  src: url("../../assets/boxyBold.ttf");
+}
+
+h1 {
+  font-family: "04B30";
+  font-size: 8vw;
+  color: white;
+  letter-spacing: -0.05em;
+  margin: 0;
+}
+
+h2 {
+  font-family: "04B30";
+  font-size: 4.5vw;
+  color: #fa9275;
+  letter-spacing: -0.05em;
+  margin: 0.5em;
+}
+
+h3 {
+  font-family: "boxyBold";
+  font-size: 2vw;
+  color: white;
+}
+
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/*Font max-height for wider screens*/
+@media (min-aspect-ratio: 1/1) {
+  h1 {
+    font-size: 8vh;
+  }
+  h2 {
+    font-size: 4.5vh;
+  }
+  h3 {
+    font-size: 2vh
+  }
+}

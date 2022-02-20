@@ -1,0 +1,11 @@
+{
+  "fonts": {
+    "boxy": {
+      "link": "https://lpc.opengameart.org/content/boxy-bold-truetype-font"
+    },
+    "04B_30": {
+      "link": "#",
+      "img": "about.gif"
+    }
+  }
+}
