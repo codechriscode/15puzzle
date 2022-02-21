@@ -25,5 +25,8 @@
   "homepage": "https://github.com/codechriscode/15puzzle#readme",
   "devDependencies": {
     "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "http-server": "^14.1.0"
   }
 }
