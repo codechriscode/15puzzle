@@ -28,6 +28,8 @@ function generate(): Grid {
       span.classList.add("bead");
     }
     span.classList.add("position");
+    span.id=`${i}`;
+    span.ondrag=(getMoving);
 
     let newBead: Bead = {
       span: span,
@@ -60,45 +62,87 @@ function render(grid: Grid): void {
 }
 
 function newGame() {
-  render(shuffleBeads(generate()));
+  let game = markMoveables(shuffleBeads(generate()));
+  render(game);
+  gameState.push(game);
+  console.log("Started new game");
 }
 
 function markMoveables(grid: Grid) {
+  grid.forEach((bead) => {
+    bead.moveable = null
+    bead.span.draggable = false
+  })
+
   let pivotPos = grid.findIndex(function (bead) {
     return bead.id == 0;
   });
 
-  console.log(`pivotPos: ${pivotPos}`);
-
   for (let i = pivotPos + GAME_WIDTH; i < GAME_SIZE; i += GAME_WIDTH) {
-    console.log(`movable up: ${i}`);
-    if (i < 16) {
-      console.log(grid);
-    }
     grid[i].moveable = "up";
+    grid[i].span.draggable = true;
   }
 
-  for (let i = pivotPos - GAME_WIDTH; i > 0; i -= GAME_WIDTH) {
-    console.log(`movable down: ${i}`);
+  for (let i = pivotPos - GAME_WIDTH; i >= 0; i -= GAME_WIDTH) {
     grid[i].moveable = "down";
+    grid[i].span.draggable = true;
   }
 
   let pivotCol = pivotPos % GAME_WIDTH;
   let limitLeft = pivotPos - pivotCol;
   let limitRight = pivotPos + (4 - pivotCol);
-  console.log(`limits: ${limitLeft} ${limitRight}, pivotCol: ${pivotCol}`);
-  for (let i = pivotPos - 1; i > limitLeft; i--) {
+  for (let i = pivotPos - 1; i >= limitLeft; i--) {
     grid[i].moveable = "right";
+    grid[i].span.draggable = true;
   }
 
   for (let i = pivotPos + 1; i < limitRight; i++) {
     grid[i].moveable = "left";
+    grid[i].span.draggable = true;
+  }
+
+  return grid;
+}
+
+type BeadEvent = DragEvent & { target: {id: string }}
+
+function getMoving(this: any, e: BeadEvent) {
+  let grid = gameState[-1];
+  let targetInGrid = grid.find((bead) => {
+    if(e.target != null) { return bead.id == parseInt(e.target.id) }
+  }) as Bead;
+
+  if(targetInGrid != undefined){
+    let movingToo = grid.filter((bead) => {
+      // let numericMatch = 
+      // switch (bead.moveable){
+      //   case "up":
+      //     if(bead.id < targetInGrid.id) return true;
+      //     break;
+      //   case "down":
+      //     if(bead.id < targetInGrid.id) return true;
+      // }
+    })
   }
 }
 
-function move() {}
+function finishMove() {
+  
+}
+function main(){
+  newGame();
+  while(true){
+    //get moves
+    //update state & render
+    //check victory
+    //if victory, alert and break
+  }
+}
 
-function finishMove() {}
+
+//main();
+newGame();
+
 
 /*Helpers*/
 //Returns in [min,max)
@@ -107,3 +151,4 @@ function randomInRange(min: number, max: number): number {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min);
 }
+
