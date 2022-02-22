@@ -1,19 +1,26 @@
 const GAME_WIDTH = 4;
 const GAME_SIZE = GAME_WIDTH * GAME_WIDTH;
 
+/*BASIC TYPES */
 type PossibleMove = "up" | "down" | "left" | "right" | null;
 
 type Bead = {
   span: HTMLSpanElement;
   id: number;
-  moveable: PossibleMove;
+  movable: PossibleMove;
+  position: number;
+  //Faster to write and read position than
+  //array.findIndex() + ObjectId policy issues
+  //prevent a simple array.indexOf or obj.keyOf
 };
 
 type Grid = Array<Bead>;
 
+//Updated every time there is a new render
 type GameState = Array<Grid>;
 let gameState: GameState = [];
 
+/*GAME SETUP ***************************************/
 function generate(): Grid {
   //Generate beads 0-15
   let beadSequence: Grid = [];
@@ -28,17 +35,16 @@ function generate(): Grid {
       span.classList.add("bead");
     }
     span.classList.add("position");
-    span.id=`${i}`;
-    span.ondrag=(getMoving);
+    span.id = `${i}`;
 
     let newBead: Bead = {
       span: span,
       id: i,
-      moveable: null,
+      movable: null,
+      position: i,
     };
     beadSequence.push(newBead);
   }
-
   return beadSequence;
 }
 
@@ -51,100 +57,134 @@ function shuffleBeads(beadSequence: Grid): Grid {
   return shuffledGrid;
 }
 
-function render(grid: Grid): void {
+function renderAndSetState(grid: Grid): void {
   let gridSpace = document.getElementById("playGround");
+  let newGrid = markMovables(grid);
   if (gridSpace != null) {
     gridSpace.innerHTML = "";
-    for (let i = 0; i < GAME_SIZE; i++) {
-      gridSpace.appendChild(grid[i].span);
+    //Saves the exact order that is printed
+    for (let i = 0; i < newGrid.length; i++) {
+      gridSpace.appendChild(newGrid[i].span);
+      newGrid[i].position = i;
     }
   }
+  gameState.push(newGrid);
 }
 
 function newGame() {
-  let game = markMoveables(shuffleBeads(generate()));
-  render(game);
-  gameState.push(game);
+  let game = shuffleBeads(generate());
+  renderAndSetState(game);
   console.log("Started new game");
 }
 
-function markMoveables(grid: Grid) {
-  grid.forEach((bead) => {
-    bead.moveable = null
-    bead.span.draggable = false
-  })
-
-  let pivotPos = grid.findIndex(function (bead) {
-    return bead.id == 0;
+/*DYNAMICS *****************************************/
+function markMovables(grid: Grid) {
+  grid.forEach((_, beadIndex, origGrid) => {
+    origGrid[beadIndex].movable = null;
+    origGrid[beadIndex].span.draggable = false;
+    origGrid[beadIndex].span.onclick = null;
   });
+  let pivotPos = findBeadIndex(0, grid);
 
+  /**Loops aim directly at the numerically correct positions*/
   for (let i = pivotPos + GAME_WIDTH; i < GAME_SIZE; i += GAME_WIDTH) {
-    grid[i].moveable = "up";
+    grid[i].movable = "up";
     grid[i].span.draggable = true;
+    grid[i].span.onclick = clickHandler;
   }
-
   for (let i = pivotPos - GAME_WIDTH; i >= 0; i -= GAME_WIDTH) {
-    grid[i].moveable = "down";
+    grid[i].movable = "down";
     grid[i].span.draggable = true;
+    grid[i].span.onclick = clickHandler;
   }
-
   let pivotCol = pivotPos % GAME_WIDTH;
   let limitLeft = pivotPos - pivotCol;
-  let limitRight = pivotPos + (4 - pivotCol);
+  let limitRight = pivotPos + (GAME_WIDTH - pivotCol);
   for (let i = pivotPos - 1; i >= limitLeft; i--) {
-    grid[i].moveable = "right";
+    grid[i].movable = "right";
     grid[i].span.draggable = true;
+    grid[i].span.onclick = clickHandler;
   }
-
   for (let i = pivotPos + 1; i < limitRight; i++) {
-    grid[i].moveable = "left";
+    grid[i].movable = "left";
     grid[i].span.draggable = true;
+    grid[i].span.onclick = clickHandler;
   }
-
   return grid;
 }
 
-type BeadEvent = DragEvent & { target: {id: string }}
+type BeadEvent = MouseEvent & { currentTarget: { id: string } };
 
-function getMoving(this: any, e: BeadEvent) {
-  let grid = gameState[-1];
-  let targetInGrid = grid.find((bead) => {
-    if(e.target != null) { return bead.id == parseInt(e.target.id) }
+function clickHandler(e: BeadEvent) {
+  let grid = gameState[gameState.length - 1];
+  let targetBead = grid.find((bead) => {
+    if (e.currentTarget != null) {
+      return bead.id == parseInt(e.currentTarget.id);
+    }
   }) as Bead;
 
-  if(targetInGrid != undefined){
-    let movingToo = grid.filter((bead) => {
-      // let numericMatch = 
-      // switch (bead.moveable){
-      //   case "up":
-      //     if(bead.id < targetInGrid.id) return true;
-      //     break;
-      //   case "down":
-      //     if(bead.id < targetInGrid.id) return true;
-      // }
-    })
+  let movingTogether: Array<Bead>;
+  movingTogether = grid.filter((bead) => {
+    if (targetBead.movable == bead.movable) {
+      switch (bead.movable) {
+        case "up":
+          if (bead.position <= targetBead.position) return true;
+          break;
+        case "left":
+          if (bead.position <= targetBead.position) return true;
+          break;
+        case "down":
+          if (bead.position >= targetBead.position) return true;
+          break;
+        case "right":
+          if (bead.position >= targetBead.position) return true;
+          break;
+      }
+    } else return false;
+  });
+  finishMove(movingTogether, grid);
+}
+
+//Does the reordering of elements.
+//Position-writing still happening at renderAndSetState
+function finishMove(beadsToMove: Array<Bead>, grid: Grid) {
+  //stores pivot and moves list of moveables to its position
+  let pivot = grid[findBeadIndex(0, grid)];
+  switch (beadsToMove[0].movable) {
+    case "up":
+      for (let i = 0; i < beadsToMove.length; i++) {
+        grid[pivot.position + i * GAME_WIDTH] = beadsToMove[i];
+        grid[beadsToMove[i].position] = pivot;
+      }
+      break;
+    case "left":
+      for (let i = 0; i < beadsToMove.length; i++) {
+        grid[pivot.position + i] = beadsToMove[i];
+        grid[beadsToMove[i].position] = pivot;
+      }
+      break;
+    case "down":
+      beadsToMove.reverse();
+      for (let i = 0; i < beadsToMove.length; i++) {
+        grid[pivot.position - i * GAME_WIDTH] = beadsToMove[i];
+        grid[beadsToMove[i].position] = pivot;
+      }
+      break;
+    case "right":
+      beadsToMove.reverse();
+      for (let i = 0; i < beadsToMove.length; i++) {
+        grid[pivot.position - i] = beadsToMove[i];
+        grid[beadsToMove[i].position] = pivot;
+      }
+      break;
   }
+  renderAndSetState(grid);
 }
 
-function finishMove() {
-  
-}
-function main(){
-  newGame();
-  while(true){
-    //get moves
-    //update state & render
-    //check victory
-    //if victory, alert and break
-  }
-}
-
-
-//main();
+/*STARTING POINT **********************************/
 newGame();
 
-
-/*Helpers*/
+/*HELPERS *****************************************/
 //Returns in [min,max)
 function randomInRange(min: number, max: number): number {
   min = Math.ceil(min);
@@ -152,3 +192,16 @@ function randomInRange(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+function findBeadIndex(id: number, grid: Grid) {
+  return grid.findIndex(function (bead) {
+    return bead.id == id;
+  });
+}
+
+// function dispatchBeadEvent(e: Event) {
+//   let beadNumber = e.currentTarget as HTMLElement
+//   document.getElementById(beadNumber.innerHTML).dispatchEvent("click")
+// }
+
+// function executeInDirection(bead, direction, callback)
+// Should solve repetition of switch/case
