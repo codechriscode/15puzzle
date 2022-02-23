@@ -2,6 +2,7 @@ const GAME_WIDTH = 4;
 const GAME_SIZE = GAME_WIDTH * GAME_WIDTH;
 
 type Grid = Array<number>;
+type PossibleMove = "up" | "down" | "left" | "right" | null;
 
 type GameState = Array<Grid>;
 let gameState = [];
@@ -14,14 +15,12 @@ function generate(): Grid {
   return shuffle(beadSequence);
 }
 
-// Creates spans and resets playGround
+// Creates spans and sets div#playGround
 function render(grid: Grid) {
-  let rendered: HTMLDivElement = document.createElement("div");
-  rendered.classList.add("container")
-  rendered.id = "playGround"
+  let rendered: DocumentFragment = document.createDocumentFragment();
   for (let i = 0; i < grid.length; i++) {
     let span = document.createElement("span");
-    //i = 0 is always empty space
+    //grid[i] == 0 is always empty space
     if (grid[i]) {
       let h2 = document.createElement("h2");
       h2.innerText = `${grid[i]}`;
@@ -30,13 +29,23 @@ function render(grid: Grid) {
     }
     span.classList.add("position");
     span.id = `${grid[i]}`;
+    span.onclick = handleClick;
     rendered.appendChild(span);
   }
-  console.log(rendered);
   let gameSpace = document.getElementById("playGround");
-  gameSpace.innerHTML = rendered.innerHTML;
+  gameSpace.replaceChildren(rendered);
 }
 
+function handleClick(e) {
+  let targetId = parseInt(e.currentTarget.id);
+  console.log(isMovable(targetId));
+}
+
+function finishMove() {}
+
+let newGame = generate();
+setState(newGame);
+render(newGame);
 
 
 /*HELPERS *****************************************/
@@ -47,7 +56,7 @@ function randomInRange(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-function shuffle(array: Grid){
+function shuffle(array: Grid) {
   let shuffledGrid: Grid = [];
   for (let i = 0; i < GAME_SIZE; i++) {
     let randomIndex = randomInRange(0, array.length);
@@ -56,7 +65,26 @@ function shuffle(array: Grid){
   return shuffledGrid;
 }
 
-function setSate(grid: Grid) {
+function setState(grid: Grid) {
+  gameState.push(grid);
 }
 
-render(generate());
+function isMovable(
+  selected: number,
+  grid: Grid = gameState[gameState.length - 1]
+): PossibleMove {
+  let pivotPos = grid.indexOf(0);
+  let selPos = grid.indexOf(selected);
+  let sameCol =
+    Math.floor(pivotPos % GAME_WIDTH) == Math.floor(selPos % GAME_WIDTH);
+  let sameRow =
+    Math.floor(pivotPos / GAME_WIDTH) == Math.floor(selPos / GAME_WIDTH);
+
+  if (sameCol) {
+    return selPos > pivotPos ? "up" : "down";
+  } else if (sameRow) {
+    return selPos > pivotPos ? "left" : "right";
+  } else return null;
+}
+
+function getNextMovable(grid: Grid) {}
