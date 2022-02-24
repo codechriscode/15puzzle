@@ -14,13 +14,13 @@ function render(grid) {
     let rendered = document.createDocumentFragment();
     for (let i = 0; i < grid.length; i++) {
         let span = document.createElement("span");
+        let h2 = document.createElement("h2");
         //grid[i] == 0 is always empty space
         if (grid[i]) {
-            let h2 = document.createElement("h2");
             h2.innerText = `${grid[i]}`;
-            span.appendChild(h2);
             span.classList.add("bead");
         }
+        span.appendChild(h2);
         span.classList.add("position");
         span.id = `${grid[i]}`;
         span.onclick = handleClick;
@@ -37,7 +37,7 @@ function handleClick(e, grid = gameState[gameState.length - 1]) {
     //Confirm move: create new history that
     //will be changed and rendered
     if (movability) {
-        gameState.push([...gameState[gameState.length - 1]]);
+        setState([...gameState[gameState.length - 1]]);
         finishMove(indexOfSel, movability);
         render(gameState[gameState.length - 1]);
     }
