@@ -3,6 +3,9 @@
 This is my implementation of 15puzzle using TypeScript, HTML5 and CSS. <br>
 Enjoy!
 
+## Disclaimer
+To find the first implementation, please check `src/game.ts` available before commit `0c2dc7f7`
+
 ## How to run
 You can probably just open `index.html` in your browser.
 If interactivity fails, try running
