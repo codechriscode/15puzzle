@@ -12,5 +12,10 @@
       "img": "about.gif"
     }
   },
+  "otherResources":{
+    "type": "icon",
+    "author": "Taufik Ramadhan",
+    "link": "https://www.flaticon.com/authors/taufik-ramadhan"
+  },
   "disclaimer": "This website does not store cookies or other tracking technology"
 }

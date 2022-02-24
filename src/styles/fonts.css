@@ -30,6 +30,11 @@ h3 {
   color: white;
 }
 
+a {
+  text-decoration: none;
+  color: white;
+}
+
 #undo {
   width: 4vw;
   max-width: 4vh;
