@@ -10,7 +10,7 @@ function generate() {
     return shuffle(beadSequence);
 }
 // Creates spans and sets div#playGround
-function render(grid) {
+function render(grid = lastState()) {
     let rendered = document.createDocumentFragment();
     for (let i = 0; i < grid.length; i++) {
         let span = document.createElement("span");
@@ -30,20 +30,20 @@ function render(grid) {
     gameSpace.replaceChildren(rendered);
 }
 // Checks click location and moves if movable
-function handleClick(e, grid = gameState[gameState.length - 1]) {
+function handleClick(e, grid = lastState()) {
     let selId = parseInt(e.currentTarget.id);
     let indexOfSel = grid.indexOf(selId);
     let movability = isMovable(indexOfSel);
     //Confirm move: create new history that
     //will be changed and rendered
     if (movability) {
-        setState([...gameState[gameState.length - 1]]);
+        setState([...lastState()]);
         finishMove(indexOfSel, movability);
-        render(gameState[gameState.length - 1]);
+        render();
     }
 }
 // Will recursively move pieces to the empty space.
-function finishMove(selPos, direction, grid = gameState[gameState.length - 1]) {
+function finishMove(selPos, direction, grid = lastState()) {
     let destPos = selPos + (moveBy(direction));
     // If it has not found the current empty position,
     // Swap the next movable in line with the next one
@@ -53,9 +53,18 @@ function finishMove(selPos, direction, grid = gameState[gameState.length - 1]) {
     }
     [grid[selPos], grid[destPos]] = [grid[destPos], grid[selPos]];
 }
-let newGame = generate();
-setState(newGame);
-render(newGame);
+function undo() {
+    gameState.pop();
+    render();
+}
+function start() {
+    let undoBtn = document.getElementById("undo");
+    undoBtn.onclick = undo;
+    let newGame = generate();
+    setState(newGame);
+    render();
+}
+start();
 /*HELPERS *****************************************/
 //Returns in [min,max)
 function randomInRange(min, max) {
@@ -100,5 +109,8 @@ function moveBy(direction) {
         default:
             return 0;
     }
+}
+function lastState() {
+    return gameState[gameState.length - 1];
 }
 // function getNextMovable(grid: Grid) {}
