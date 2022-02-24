@@ -1,5 +1,5 @@
-const GAME_WIDTH = 4;
-const GAME_SIZE = GAME_WIDTH * GAME_WIDTH;
+let GAME_WIDTH: number;
+let GAME_SIZE: number;
 
 type Grid = Array<number>;
 type PossibleMove = "up" | "down" | "left" | "right" | null;
@@ -82,6 +82,8 @@ function undo() {
 }
 
 function start() {
+  setGameLevel(getGameLevel());
+
   let undoBtn = document.getElementById("undo") as HTMLElement;
   undoBtn.onclick = undo;
 
@@ -148,4 +150,22 @@ function moveBy(direction: PossibleMove) {
 function lastState() {
   return gameState[gameState.length - 1];
 }
-// function getNextMovable(grid: Grid) {}
+
+function setGameLevel(nr: number) {
+  GAME_WIDTH = nr;
+  GAME_SIZE = GAME_WIDTH * GAME_WIDTH;
+
+  let playGround = document.getElementById("playGround") as HTMLDivElement;
+  playGround.style.gridTemplateColumns = `repeat(${GAME_WIDTH},1fr)`;
+}
+
+function getGameLevel() {
+  let level = 0;
+  while (true) {
+    level = parseInt(prompt("Choose game level 3-5") as string);
+    if (typeof level == "number" && (level >= 3 || level <= 5)) {
+      break;
+    }
+  }
+  return level;
+}

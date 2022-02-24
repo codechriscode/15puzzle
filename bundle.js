@@ -1,6 +1,6 @@
 "use strict";
-const GAME_WIDTH = 4;
-const GAME_SIZE = GAME_WIDTH * GAME_WIDTH;
+let GAME_WIDTH;
+let GAME_SIZE;
 let gameState = [];
 function generate() {
     let beadSequence = [];
@@ -60,6 +60,7 @@ function undo() {
     }
 }
 function start() {
+    setGameLevel(getGameLevel());
     let undoBtn = document.getElementById("undo");
     undoBtn.onclick = undo;
     let newGame = generate();
@@ -115,4 +116,19 @@ function moveBy(direction) {
 function lastState() {
     return gameState[gameState.length - 1];
 }
-// function getNextMovable(grid: Grid) {}
+function setGameLevel(nr) {
+    GAME_WIDTH = nr;
+    GAME_SIZE = GAME_WIDTH * GAME_WIDTH;
+    let playGround = document.getElementById("playGround");
+    playGround.style.gridTemplateColumns = `repeat(${GAME_WIDTH},1fr)`;
+}
+function getGameLevel() {
+    let level = 0;
+    while (true) {
+        level = parseInt(prompt("Choose game level 3-5"));
+        if (typeof level == "number" && (level >= 3 || level <= 5)) {
+            break;
+        }
+    }
+    return level;
+}
