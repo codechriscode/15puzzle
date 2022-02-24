@@ -12,7 +12,7 @@ type Bead = HTMLSpanElement & {
   childElementCount: 0 | 1;
   classList: "position" | "bead position";
   onclick: Function;
-}
+};
 
 function generate(): Grid {
   let beadSequence: Grid = [];
@@ -48,12 +48,12 @@ function handleClick(e: any, grid: Grid = lastState()) {
   let selId = parseInt(e.currentTarget.id);
   let indexOfSel = grid.indexOf(selId);
   let movability = isMovable(indexOfSel);
-  
+
   //Confirm move: create new history that
   //will be changed and rendered
-  if(movability) {
-    setState([...lastState()])
-    finishMove(indexOfSel, movability)
+  if (movability) {
+    setState([...lastState()]);
+    finishMove(indexOfSel, movability);
     render();
   }
 }
@@ -64,32 +64,33 @@ function finishMove(
   direction: PossibleMove,
   grid: Grid = lastState()
 ) {
-  let destPos: number = selPos+(moveBy(direction))
+  let destPos: number = selPos + moveBy(direction);
   // If it has not found the current empty position,
   // Swap the next movable in line with the next one
-  // Until the empty space is actually swapped 
-  if(destPos != grid.indexOf(0)) {
+  // Until the empty space is actually swapped
+  if (destPos != grid.indexOf(0)) {
     finishMove(destPos, direction);
   }
-  [grid[selPos], grid[destPos]] = [grid[destPos], grid[selPos]]
+  [grid[selPos], grid[destPos]] = [grid[destPos], grid[selPos]];
 }
 
-function undo(){
-  gameState.pop();
-  render();
+function undo() {
+  if (gameState.length > 1) {
+    gameState.pop();
+    render();
+  }
 }
 
 function start() {
   let undoBtn = document.getElementById("undo") as HTMLElement;
   undoBtn.onclick = undo;
-  
+
   let newGame = generate();
   setState(newGame);
   render();
 }
 
 start();
-
 
 /*HELPERS *****************************************/
 //Returns in [min,max)
@@ -130,7 +131,7 @@ function isMovable(
 }
 
 function moveBy(direction: PossibleMove) {
-  switch(direction) {
+  switch (direction) {
     case "up":
       return -GAME_WIDTH;
     case "down":
@@ -138,13 +139,13 @@ function moveBy(direction: PossibleMove) {
     case "left":
       return -1;
     case "right":
-      return 1
+      return 1;
     default:
       return 0;
   }
 }
 
 function lastState() {
-  return gameState[gameState.length - 1]
+  return gameState[gameState.length - 1];
 }
 // function getNextMovable(grid: Grid) {}

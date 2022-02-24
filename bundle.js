@@ -44,18 +44,20 @@ function handleClick(e, grid = lastState()) {
 }
 // Will recursively move pieces to the empty space.
 function finishMove(selPos, direction, grid = lastState()) {
-    let destPos = selPos + (moveBy(direction));
+    let destPos = selPos + moveBy(direction);
     // If it has not found the current empty position,
     // Swap the next movable in line with the next one
-    // Until the empty space is actually swapped 
+    // Until the empty space is actually swapped
     if (destPos != grid.indexOf(0)) {
         finishMove(destPos, direction);
     }
     [grid[selPos], grid[destPos]] = [grid[destPos], grid[selPos]];
 }
 function undo() {
-    gameState.pop();
-    render();
+    if (gameState.length > 1) {
+        gameState.pop();
+        render();
+    }
 }
 function start() {
     let undoBtn = document.getElementById("undo");
