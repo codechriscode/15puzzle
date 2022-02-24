@@ -7,6 +7,13 @@ type PossibleMove = "up" | "down" | "left" | "right" | null;
 type GameState = Array<Grid>;
 let gameState: GameState = [];
 
+type Bead = HTMLSpanElement & {
+  id: number;
+  childElementCount: 0 | 1;
+  classList: "position" | "bead position";
+  onclick: Function;
+}
+
 function generate(): Grid {
   let beadSequence: Grid = [];
   for (let i = 0; i < GAME_SIZE; i++) {
@@ -20,17 +27,17 @@ function render(grid: Grid) {
   let rendered: DocumentFragment = document.createDocumentFragment();
   for (let i = 0; i < grid.length; i++) {
     let span = document.createElement("span");
+    let h2 = document.createElement("h2");
     //grid[i] == 0 is always empty space
     if (grid[i]) {
-      let h2 = document.createElement("h2");
       h2.innerText = `${grid[i]}`;
-      span.appendChild(h2);
       span.classList.add("bead");
     }
+    span.appendChild(h2);
     span.classList.add("position");
     span.id = `${grid[i]}`;
     span.onclick = handleClick;
-    rendered.appendChild(span);
+    rendered.appendChild(span as Bead);
   }
   let gameSpace = document.getElementById("playGround") as HTMLElement;
   gameSpace.replaceChildren(rendered);
@@ -45,7 +52,7 @@ function handleClick(e: any, grid: Grid = gameState[gameState.length -1]) {
   //Confirm move: create new history that
   //will be changed and rendered
   if(movability) {
-    gameState.push([...gameState[gameState.length-1]])
+    setState([...gameState[gameState.length-1]])
     finishMove(indexOfSel, movability)
     render(gameState[gameState.length-1]);
   }
