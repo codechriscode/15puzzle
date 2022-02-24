@@ -1,4 +1,8 @@
 {
+  "author": {
+    "name": "codechriscode",
+    "link": "https://www.linktr.ee/codechriscode"
+  },
   "fonts": {
     "boxy": {
       "link": "https://lpc.opengameart.org/content/boxy-bold-truetype-font"
@@ -7,5 +11,6 @@
       "link": "#",
       "img": "about.gif"
     }
-  }
+  },
+  "disclaimer": "This website does not store cookies or other tracking technology"
 }

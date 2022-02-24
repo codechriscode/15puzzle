@@ -30,6 +30,15 @@ h3 {
   color: white;
 }
 
+#undo {
+  width: 4vw;
+  max-width: 4vh;
+  max-height: 4vh;
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+  transform: rotate(180deg);
+}
+
 * {
   -webkit-user-select: none;
   -moz-user-select: none;
