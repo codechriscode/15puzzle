@@ -1,3 +1,4 @@
+"use strict";
 const GAME_WIDTH = 4;
 const GAME_SIZE = GAME_WIDTH * GAME_WIDTH;
 let gameState = [];
@@ -28,11 +29,30 @@ function render(grid) {
     let gameSpace = document.getElementById("playGround");
     gameSpace.replaceChildren(rendered);
 }
-function handleClick(e) {
-    let targetId = parseInt(e.currentTarget.id);
-    console.log(isMovable(targetId));
+// Checks click location and moves if movable
+function handleClick(e, grid = gameState[gameState.length - 1]) {
+    let selId = parseInt(e.currentTarget.id);
+    let indexOfSel = grid.indexOf(selId);
+    let movability = isMovable(indexOfSel);
+    //Confirm move: create new history that
+    //will be changed and rendered
+    if (movability) {
+        gameState.push([...gameState[gameState.length - 1]]);
+        finishMove(indexOfSel, movability);
+        render(gameState[gameState.length - 1]);
+    }
 }
-function finishMove() { }
+// Will recursively move pieces to the empty space.
+function finishMove(selPos, direction, grid = gameState[gameState.length - 1]) {
+    let destPos = selPos + (moveBy(direction));
+    // If it has not found the current empty position,
+    // Swap the next movable in line with the next one
+    // Until the empty space is actually swapped 
+    if (destPos != grid.indexOf(0)) {
+        finishMove(destPos, direction);
+    }
+    [grid[selPos], grid[destPos]] = [grid[destPos], grid[selPos]];
+}
 let newGame = generate();
 setState(newGame);
 render(newGame);
@@ -54,9 +74,8 @@ function shuffle(array) {
 function setState(grid) {
     gameState.push(grid);
 }
-function isMovable(selected, grid = gameState[gameState.length - 1]) {
+function isMovable(selPos, grid = gameState[gameState.length - 1]) {
     let pivotPos = grid.indexOf(0);
-    let selPos = grid.indexOf(selected);
     let sameCol = Math.floor(pivotPos % GAME_WIDTH) == Math.floor(selPos % GAME_WIDTH);
     let sameRow = Math.floor(pivotPos / GAME_WIDTH) == Math.floor(selPos / GAME_WIDTH);
     if (sameCol) {
@@ -68,4 +87,18 @@ function isMovable(selected, grid = gameState[gameState.length - 1]) {
     else
         return null;
 }
-function getNextMovable(grid) { }
+function moveBy(direction) {
+    switch (direction) {
+        case "up":
+            return -GAME_WIDTH;
+        case "down":
+            return GAME_WIDTH;
+        case "left":
+            return -1;
+        case "right":
+            return 1;
+        default:
+            return 0;
+    }
+}
+// function getNextMovable(grid: Grid) {}

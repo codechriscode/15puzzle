@@ -5,7 +5,7 @@ type Grid = Array<number>;
 type PossibleMove = "up" | "down" | "left" | "right" | null;
 
 type GameState = Array<Grid>;
-let gameState = [];
+let gameState: GameState = [];
 
 function generate(): Grid {
   let beadSequence: Grid = [];
@@ -32,21 +32,44 @@ function render(grid: Grid) {
     span.onclick = handleClick;
     rendered.appendChild(span);
   }
-  let gameSpace = document.getElementById("playGround");
+  let gameSpace = document.getElementById("playGround") as HTMLElement;
   gameSpace.replaceChildren(rendered);
 }
 
-function handleClick(e) {
-  let targetId = parseInt(e.currentTarget.id);
-  console.log(isMovable(targetId));
+// Checks click location and moves if movable
+function handleClick(e: any, grid: Grid = gameState[gameState.length -1]) {
+  let selId = parseInt(e.currentTarget.id);
+  let indexOfSel = grid.indexOf(selId);
+  let movability = isMovable(indexOfSel);
+  
+  //Confirm move: create new history that
+  //will be changed and rendered
+  if(movability) {
+    gameState.push([...gameState[gameState.length-1]])
+    finishMove(indexOfSel, movability)
+    render(gameState[gameState.length-1]);
+  }
 }
 
-function finishMove() {}
+// Will recursively move pieces to the empty space.
+function finishMove(
+  selPos: number,
+  direction: PossibleMove,
+  grid: Grid = gameState[gameState.length - 1]
+) {
+  let destPos: number = selPos+(moveBy(direction))
+  // If it has not found the current empty position,
+  // Swap the next movable in line with the next one
+  // Until the empty space is actually swapped 
+  if(destPos != grid.indexOf(0)) {
+    finishMove(destPos, direction);
+  }
+  [grid[selPos], grid[destPos]] = [grid[destPos], grid[selPos]]
+}
 
 let newGame = generate();
 setState(newGame);
 render(newGame);
-
 
 /*HELPERS *****************************************/
 //Returns in [min,max)
@@ -70,11 +93,10 @@ function setState(grid: Grid) {
 }
 
 function isMovable(
-  selected: number,
+  selPos: number,
   grid: Grid = gameState[gameState.length - 1]
 ): PossibleMove {
   let pivotPos = grid.indexOf(0);
-  let selPos = grid.indexOf(selected);
   let sameCol =
     Math.floor(pivotPos % GAME_WIDTH) == Math.floor(selPos % GAME_WIDTH);
   let sameRow =
@@ -87,4 +109,19 @@ function isMovable(
   } else return null;
 }
 
-function getNextMovable(grid: Grid) {}
+function moveBy(direction: PossibleMove) {
+  switch(direction) {
+    case "up":
+      return -GAME_WIDTH;
+    case "down":
+      return GAME_WIDTH;
+    case "left":
+      return -1;
+    case "right":
+      return 1
+    default:
+      return 0;
+  }
+}
+
+// function getNextMovable(grid: Grid) {}
