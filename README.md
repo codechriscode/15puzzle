@@ -1,6 +1,7 @@
 # 15puzzle
 
-This is my implementation of 15puzzle using TypeScript, HTML5 and CSS. <br>
+This is my implementation of 15puzzle UI using TypeScript, HTML5 and CSS. <br>
+There's no solvability or victory calculation (yet!), but you can play now on [GitHub pages](https://codechriscode.github.io/15puzzle).<br>
 Enjoy!
 
 ## Disclaimer
@@ -25,4 +26,4 @@ You should change TypeScript files, recompile them and run an http-server to pre
 ```sh
 npx tsc && npx http-server -p 8080
 ```
-A single compiled file is also commited to make it easier to run anywhere.
+A single compiled file is also committed to make it easier to run anywhere.
