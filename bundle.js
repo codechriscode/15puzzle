@@ -125,7 +125,7 @@ function setGameLevel(nr) {
 function getGameLevel() {
     let level = 0;
     while (true) {
-        level = parseInt(prompt("Choose game level 3-5"));
+        level = parseInt(prompt("Choose game level 3-5", "4"));
         if (typeof level == "number" && (level >= 3 || level <= 5)) {
             break;
         }
